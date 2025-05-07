@@ -1,0 +1,7 @@
+#pragma once
+
+#include "Logging/LogMacros.h"
+
+CODEREDREBOOT_API DECLARE_LOG_CATEGORY_EXTERN(LogBaseInput, Log, All);
+CODEREDREBOOT_API DECLARE_LOG_CATEGORY_EXTERN(LogBaseAbilitySystem, Log, All);
+CODEREDREBOOT_API DECLARE_LOG_CATEGORY_EXTERN(LogMultiGameInstance, Log, All);
