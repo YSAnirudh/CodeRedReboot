@@ -115,10 +115,15 @@ void ABasePlayerController::SwitchGame(EGameType NewGameType)
 
 	const FString LevelPath = GameInstance->GetGameLevelPath(NewGameType);
 
-	UGameplayStatics::OpenLevel(this, FName(*LevelPath));
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+	LatentInfo.ExecutionFunction = "OnLevelLoadComplete";
+	LatentInfo.UUID = FGuid::NewGuid().A;
+	LatentInfo.Linkage = 0;
+
+	UGameplayStatics::LoadStreamLevel(this, FName(*LevelPath), true, true, LatentInfo);
 
 	UE_LOG(LogBasePlayerController, Log, TEXT("Switching to game: %s"), *UEnum::GetValueAsString(NewGameType));
-
 }
 
 void ABasePlayerController::ReturnToHub()
@@ -170,12 +175,23 @@ void ABasePlayerController::HideLoadingScreen()
 {
 	if (LoadingScreenWidget)
 	{
-		LoadingScreenWidget->RemoveFromViewport();
+		LoadingScreenWidget->RemoveFromParent();
 		LoadingScreenWidget = nullptr;
 	}
 	else
 	{
 		UE_LOG(LogBaseInput, Warning, TEXT("No Loading Screen Widget found in the player controller %s"), *GetName());
+	}
+}
+
+void ABasePlayerController::OnLevelLoadComplete()
+{
+	UMultiGameInstance* GameInstance = Cast<UMultiGameInstance>(GetGameInstance());
+	if (GameInstance)
+	{
+		GameInstance->LoadGameState();
+
+		HideLoadingScreen();
 	}
 }
 

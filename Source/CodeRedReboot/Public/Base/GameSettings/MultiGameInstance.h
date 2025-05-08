@@ -16,6 +16,7 @@ enum class EGameType : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameTypeChanged, EGameType, PreviousGameType, EGameType, NewGameType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameLoadComplete, EGameType, LoadedGameType);
 
 /**
  * 
@@ -40,6 +41,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Game Switching")
 	FString GetGameLevelPath(EGameType GameType) const;
 
+	float GetCurrentGameLoadingProgress() const { return CurrentGameLoadProgress; }
+
 	UFUNCTION(BlueprintCallable, Category = "Game Switching")
 	void SaveGameState();
 
@@ -48,6 +51,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "Game Switching")
 	FOnGameTypeChanged OnGameTypeChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Game Switching")
+	FOnGameLoadComplete OnGameLoadComplete;
 
 protected:
 
@@ -58,5 +64,11 @@ protected:
 	TMap<EGameType, FString> GameLevelPaths;
 
 	void InitializeDefaultLevelPaths();
+
+private:
+
+	float CurrentGameLoadProgress = 0.0f;
+
+	void OnLevelStreamingComplete();
 	
 };

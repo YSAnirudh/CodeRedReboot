@@ -28,6 +28,12 @@ public:
 	virtual void AbilitySpecInputPressed(FGameplayAbilitySpec& Spec) override;
 	virtual void AbilitySpecInputReleased(FGameplayAbilitySpec& Spec) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	TArray<FGameplayAbilitySpecHandle> GetAbilitySpecHandlesByInputTag(const FGameplayTag& InputTag);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	bool HasActiveAbilityWithTag(const FGameplayTag& AbilityTag);
+
 	/** Apply a gameplay effect to self */
 	UFUNCTION(BlueprintCallable, Category = GameplayEffects, meta = (DisplayName = "ApplyGameplayEffectToSelfIfNotActive", ScriptName = "ApplyGameplayEffectToSelfIfNotActive"))
 	FActiveGameplayEffectHandle BP_ApplyGameplayEffectToSelfIfNotActive(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level, FGameplayEffectContextHandle EffectContext);

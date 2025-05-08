@@ -25,6 +25,12 @@ class CODEREDREBOOT_API ABasePlayerController : public APlayerController
 public:
 
 	ABasePlayerController();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ShowLoadingScreen();
+
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void HideLoadingScreen();
 	
 protected:
 
@@ -52,11 +58,8 @@ protected:
 	UPROPERTY()
 	UUserWidget* LoadingScreenWidget = nullptr;
 
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	void ShowLoadingScreen();
-
-	UFUNCTION(BlueprintCallable, Category = "UI")
-	void HideLoadingScreen();
+	UFUNCTION()
+	void OnLevelLoadComplete();
 
 	UFUNCTION()
 	void UpdateInputMappingContext(EGameType GameType);

@@ -58,6 +58,13 @@ void UMultiGameInstance::InitializeDefaultLevelPaths()
 	GameLevelPaths.Add(EGameType::Control, TEXT("/Game/Control/Levels/L_Control"));
 }
 
+void UMultiGameInstance::OnLevelStreamingComplete()
+{
+	CurrentGameLoadProgress = 1.0f;
+	OnGameLoadComplete.Broadcast(CurrentGameType);
+	UE_LOG(LogMultiGameInstance, Log, TEXT("Level streaming complete for game type: %s"), *UEnum::GetValueAsString(CurrentGameType));
+}
+
 void UMultiGameInstance::SaveGameState()
 {
 	UE_LOG(LogMultiGameInstance, Log, TEXT("Saving game state for game type (Place holder): %s"), *UEnum::GetValueAsString(CurrentGameType));

@@ -157,6 +157,45 @@ void UBaseAbilitySystemComponent::AbilitySpecInputReleased(FGameplayAbilitySpec&
 	}
 }
 
+TArray<FGameplayAbilitySpecHandle> UBaseAbilitySystemComponent::GetAbilitySpecHandlesByInputTag(const FGameplayTag& InputTag)
+{
+	TArray<FGameplayAbilitySpecHandle> Results;
+
+	if (InputTag.IsValid())
+	{
+		for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+		{
+			if (AbilitySpec.Ability && AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+			{
+				Results.Add(AbilitySpec.Handle);
+			}
+		}
+	}
+
+	return Results;
+}
+
+bool UBaseAbilitySystemComponent::HasActiveAbilityWithTag(const FGameplayTag& AbilityTag)
+{
+	if (!AbilityTag.IsValid())
+	{
+		return false;
+	}
+
+	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+	{
+		if (AbilitySpec.Ability && AbilitySpec.IsActive())
+		{
+			if (AbilitySpec.Ability->GetAssetTags().HasTag(AbilityTag))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 FActiveGameplayEffectHandle UBaseAbilitySystemComponent::BP_ApplyGameplayEffectToSelfIfNotActive(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level, FGameplayEffectContextHandle EffectContext)
 {
 	if (GameplayEffectClass)
