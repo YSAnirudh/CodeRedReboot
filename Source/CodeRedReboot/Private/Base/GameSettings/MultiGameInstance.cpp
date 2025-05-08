@@ -21,20 +21,22 @@ void UMultiGameInstance::Init()
 
 void UMultiGameInstance::SwitchGame(EGameType NewGameType)
 {
-	SaveGameState();
-
-	CurrentGameType = NewGameType;
-
-	FString LevelPath = GetGameLevelPath(CurrentGameType);
-
-	if (!LevelPath.IsEmpty())
+	if (CurrentGameType != NewGameType)
 	{
-		UGameplayStatics::OpenLevel(this, FName(*LevelPath));
-		UE_LOG(LogMultiGameInstance, Log, TEXT("Switching to game: %s"), *UEnum::GetValueAsString(CurrentGameType));
-	}
-	else
-	{
-		UE_LOG(LogMultiGameInstance, Warning, TEXT("No level path found for game type: %s"), *UEnum::GetValueAsString(CurrentGameType));
+		// Notify listeners about the game type change
+		OnGameTypeChanged.Broadcast(CurrentGameType, NewGameType);
+
+		FString LevelPath = GetGameLevelPath(CurrentGameType);
+
+		if (!LevelPath.IsEmpty())
+		{
+			UGameplayStatics::OpenLevel(this, FName(*LevelPath));
+			UE_LOG(LogMultiGameInstance, Log, TEXT("Switching to game: %s"), *UEnum::GetValueAsString(CurrentGameType));
+		}
+		else
+		{
+			UE_LOG(LogMultiGameInstance, Warning, TEXT("No level path found for game type: %s"), *UEnum::GetValueAsString(CurrentGameType));
+		}
 	}
 }
 

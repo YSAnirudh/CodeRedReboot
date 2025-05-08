@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "Base/AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Base/GameSettings/MultiGameInstance.h"
 
 #include "BasePawnInterface.generated.h"
 
@@ -26,5 +27,8 @@ class CODEREDREBOOT_API IBasePawnInterface
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "BasePawnInterface")
-	UBaseAbilitySystemComponent* GetBaseAbilitySystem() const = 0;
+	UBaseAbilitySystemComponent* GetBaseAbilitySystem() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "BasePawnInterface")
+	void OnGameSwitched(EGameType NewGameType);
 };

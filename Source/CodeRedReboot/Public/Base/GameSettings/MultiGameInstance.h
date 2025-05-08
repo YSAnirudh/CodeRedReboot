@@ -15,6 +15,8 @@ enum class EGameType : uint8
 	Control UMETA(DisplayName = "Control"),
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameTypeChanged, EGameType, PreviousGameType, EGameType, NewGameType);
+
 /**
  * 
  */
@@ -37,7 +39,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Game Switching")
 	FString GetGameLevelPath(EGameType GameType) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Game Switching")
+	void SaveGameState();
+
+	UFUNCTION(BlueprintCallable, Category = "Game Switching")
+	void LoadGameState();
 	
+	UPROPERTY(BlueprintAssignable, Category = "Game Switching")
+	FOnGameTypeChanged OnGameTypeChanged;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Game Switching")
@@ -47,11 +58,5 @@ protected:
 	TMap<EGameType, FString> GameLevelPaths;
 
 	void InitializeDefaultLevelPaths();
-
-	UFUNCTION(BlueprintCallable, Category = "Game Switching")
-	void SaveGameState();
-
-	UFUNCTION(BlueprintCallable, Category = "Game Switching")
-	void LoadGameState();
 	
 };

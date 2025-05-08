@@ -6,47 +6,43 @@
 #include "Base/AbilitySystem/BaseAbilitySystemComponent.h"
 #include "BaseLogChannels.h"
 #include "Base/Character/BasePawnInterface.h"
+#include "Base/GameSettings/MultiGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 ABasePlayerController::ABasePlayerController()
 {
+}
+
+void ABasePlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (UMultiGameInstance* GameInstance = Cast<UMultiGameInstance>(GetGameInstance()))
+	{
+		GameInstance->OnGameTypeChanged.AddDynamic(this, &ABasePlayerController::OnGameTypeChanged);
+	}
 }
 
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UBaseInputComponent* EnhancedInputComponent = Cast<UBaseInputComponent>(InputComponent))
+	if (UMultiGameInstance* GameInstance = Cast<UMultiGameInstance>(GetGameInstance()))
 	{
-		if (InputMappingContext)
-		{
-			UEnhancedInputLocalPlayerSubsystem* Subsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-			if (Subsystem)
-			{
-				Subsystem->AddMappingContext(InputMappingContext, 0);
-			}
-			else
-			{
-				UE_LOG(LogBaseInput, Error, TEXT("No Enhanced Input Local Player Subsystem found!"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogBaseInput, Warning, TEXT("Input mapping passed into the player controller %s is null"), *GetName());
-		}
+		UpdateInputMappingContext(GameInstance->GetCurrentGameType());
+	}
 
-		if (InputConfig)
+	if (InputConfig)
+	{
+		TArray<uint32> BindHandles;
+		if (UBaseInputComponent* EnhancedInputComponent = Cast<UBaseInputComponent>(InputComponent))
 		{
-			TArray<uint32> BindHandles;
 			EnhancedInputComponent->BindAbilityActions(InputConfig, this, &ABasePlayerController::Input_AbilityInputTagPressed, &ABasePlayerController::Input_AbilityInputTagReleased, BindHandles);
-		}
-		else
-		{
-			UE_LOG(LogBaseInput, Warning, TEXT("Input config passed into the player controller %s is null"), *GetName());
 		}
 	}
 	else
 	{
-		UE_LOG(LogBaseInput, Error, TEXT("No Enhanced Input Component found!"));
+		UE_LOG(LogBaseInput, Warning, TEXT("Input config passed into the player controller %s is null"), *GetName());
 	}
 }
 
@@ -93,6 +89,127 @@ void ABasePlayerController::Input_AbilityInputTagReleased(FGameplayTag AbilityIn
 		{
 			UE_LOG(LogBaseInput, Warning, TEXT("Pawn %s does not implement IBasePawnInterface"), *GetPawn()->GetName());
 		}
+	}
+}
+
+void ABasePlayerController::SwitchGame(EGameType NewGameType)
+{
+	UMultiGameInstance* GameInstance = Cast<UMultiGameInstance>(GetGameInstance());
+	if (!GameInstance)
+	{
+		UE_LOG(LogBaseInput, Error, TEXT("No MultiGameInstance found!"));
+		return;
+	}
+
+	if (GameInstance->GetCurrentGameType() == NewGameType)
+	{
+		UE_LOG(LogBaseInput, Warning, TEXT("Already in the requested game type: %s"), *UEnum::GetValueAsString(NewGameType));
+		return;
+	}
+
+	ShowLoadingScreen();
+
+	GameInstance->SaveGameState();
+
+	GameInstance->SwitchGame(NewGameType);
+
+	const FString LevelPath = GameInstance->GetGameLevelPath(NewGameType);
+
+	UGameplayStatics::OpenLevel(this, FName(*LevelPath));
+
+	UE_LOG(LogBasePlayerController, Log, TEXT("Switching to game: %s"), *UEnum::GetValueAsString(NewGameType));
+
+}
+
+void ABasePlayerController::ReturnToHub()
+{
+	SwitchGame(EGameType::Hub);
+}
+
+void ABasePlayerController::OnGameTypeChanged(EGameType PreviousGameType, EGameType NewGameType)
+{
+	UpdateInputMappingContext(NewGameType);
+
+	if (GetPawn())
+	{
+		if (IBasePawnInterface* PawnInterface = Cast<IBasePawnInterface>(GetPawn()))
+		{
+			if (UBaseAbilitySystemComponent* AbilitySystem = PawnInterface->GetBaseAbilitySystem())
+			{
+				if (AbilitySystem)
+				{
+					AbilitySystem->ClearAbilityInput();
+				}
+			}
+
+			PawnInterface->OnGameSwitched(NewGameType);
+		}
+	}
+}
+
+void ABasePlayerController::ShowLoadingScreen()
+{
+	if (LoadingScreenClass)
+	{
+		if (LoadingScreenWidget == nullptr)
+		{
+			LoadingScreenWidget = CreateWidget<UUserWidget>(this, LoadingScreenClass);
+			if (LoadingScreenWidget)
+			{
+				LoadingScreenWidget->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogBaseInput, Error, TEXT("No Loading Screen Class set in the player controller %s"), *GetName());
+	}
+}
+
+void ABasePlayerController::HideLoadingScreen()
+{
+	if (LoadingScreenWidget)
+	{
+		LoadingScreenWidget->RemoveFromViewport();
+		LoadingScreenWidget = nullptr;
+	}
+	else
+	{
+		UE_LOG(LogBaseInput, Warning, TEXT("No Loading Screen Widget found in the player controller %s"), *GetName());
+	}
+}
+
+void ABasePlayerController::UpdateInputMappingContext(EGameType GameType)
+{
+	if (UBaseInputComponent* EnhancedInputComponent = Cast<UBaseInputComponent>(InputComponent))
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ClearAllMappings();
+
+			if (GameInputMappingContexts.Contains(GameType))
+			{
+				UInputMappingContext* InputMappingContext = GameInputMappingContexts[GameType];
+				if (InputMappingContext)
+				{
+					Subsystem->AddMappingContext(InputMappingContext, 0);
+					UE_LOG(LogBaseInput, Log, TEXT("Updated Input Mapping Context for game type %s"), *UEnum::GetValueAsString(GameType));
+				}
+			}
+			else
+			{
+				UE_LOG(LogBaseInput, Warning, TEXT("No Input Mapping Context found for game type %s"), *UEnum::GetValueAsString(GameType));
+			}
+		}
+		else
+		{
+			UE_LOG(LogBaseInput, Error, TEXT("No Enhanced Input Local Player Subsystem found!"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogBaseInput, Error, TEXT("No Enhanced Input Component found!"));
 	}
 }
 
