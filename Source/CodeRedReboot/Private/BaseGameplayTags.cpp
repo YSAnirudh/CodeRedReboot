@@ -4,6 +4,9 @@ namespace BaseGameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Gameplay_AbilityInputBlocked, "Gameplay.AbilityInputBlocked", "Tag used to Block Ability Input");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Gameplay_InHub, "Gameplay.InHub", "Tag indicating player is in the hub");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Gameplay_GOW, "Gameplay.GOW", "Tag indicating player is playing GOW");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Gameplay_SpiderMan, "Gameplay.SpiderMan", "Tag indicating player is playing SpiderMan");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Gameplay_Control, "Gameplay.Control", "Tag indicating player is playing Control");
 
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Move, "Input.Move", "Input for movement (2D Axis)");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Input_Interact, "Input.Interact", "Input for interaction");
