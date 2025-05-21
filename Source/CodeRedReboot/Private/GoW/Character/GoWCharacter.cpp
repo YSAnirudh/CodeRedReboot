@@ -1,14 +1,14 @@
-#include "GoW/Character/GoWCharacter.h"
+#include "GOW/Character/GOWCharacter.h"
 #include "BaseLogChannels.h"
 #include "BaseGameplayTags.h"
 
-AGoWCharacter::AGoWCharacter()
+AGOWCharacter::AGOWCharacter()
 {
     // Create the God of War specific attribute set
-    GoWAttributeSet = CreateDefaultSubobject<UGoWAttributeSet>(TEXT("GoWAttributeSet"));
+    GOWAttributeSet = CreateDefaultSubobject<UGOWAttributeSet>(TEXT("GOWAttributeSet"));
 }
 
-void AGoWCharacter::BeginPlay()
+void AGOWCharacter::BeginPlay()
 {
     Super::BeginPlay();
     
@@ -16,14 +16,14 @@ void AGoWCharacter::BeginPlay()
     InitializeAbilities();
 }
 
-void AGoWCharacter::InitializeAbilities()
+void AGOWCharacter::InitializeAbilities()
 {
     Super::InitializeAbilities();
     
     // Initialize God of War specific abilities here
 }
 
-void AGoWCharacter::OnGameSwitched_Implementation(EGameType GameType)
+void AGOWCharacter::OnGameSwitched_Implementation(EGameType GameType)
 {
     Super::OnGameSwitched_Implementation(GameType);
     

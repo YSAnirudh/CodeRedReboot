@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "Base/Character/BaseCharacter.h"
-#include "GoW/AbilitySystem/GoWAttributeSet.h"
-#include "GoWCharacter.generated.h"
+#include "GOW/AbilitySystem/GOWAttributeSet.h"
+#include "GOWCharacter.generated.h"
 
 UCLASS()
-class CODEREDREBOOT_API AGoWCharacter : public ABaseCharacter
+class CODEREDREBOOT_API AGOWCharacter : public ABaseCharacter
 {
     GENERATED_BODY()
     
 public:
-    AGoWCharacter();
+    AGOWCharacter();
 
 protected:
     virtual void BeginPlay() override;
@@ -19,5 +19,5 @@ protected:
     virtual void OnGameSwitched_Implementation(EGameType GameType) override;
 
     UPROPERTY()
-    UGoWAttributeSet* GoWAttributeSet;
+    UGOWAttributeSet* GOWAttributeSet;
 };
