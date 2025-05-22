@@ -9,10 +9,11 @@
 UENUM(BlueprintType)
 enum class EGameType : uint8
 {
-	Hub	UMETA(DisplayName = "Hub"),
-	GOW	UMETA(DisplayName = "GOW"),
-	SpiderMan	UMETA(DisplayName = "SpiderMan"),
-	Control UMETA(DisplayName = "Control"),
+	None        UMETA(DisplayName = "None"),
+	Hub         UMETA(DisplayName = "Hub"),
+	GOW	        UMETA(DisplayName = "GOW"),
+	SpiderMan   UMETA(DisplayName = "SpiderMan"),
+	Control     UMETA(DisplayName = "Control"),
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameTypeChanged, EGameType, PreviousGameType, EGameType, NewGameType);

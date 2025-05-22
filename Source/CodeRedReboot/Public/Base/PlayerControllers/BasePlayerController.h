@@ -31,6 +31,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	void HideLoadingScreen();
+
+	UFUNCTION(BlueprintCallable, Category = "Game Switching")
+	void SwitchGame(EGameType NewGameType);
+
+	UFUNCTION(BlueprintCallable, Category = "Game Switching")
+	void ReturnToHub();
 	
 protected:
 
@@ -40,12 +46,6 @@ protected:
 
 	void Input_AbilityInputTagPressed(FGameplayTag AbilityInputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag AbilityInputTag);
-
-	UFUNCTION(BlueprintCallable, Category = "Game Switching")
-	void SwitchGame(EGameType NewGameType);
-
-	UFUNCTION(BlueprintCallable, Category = "Game Switching")
-	void ReturnToHub();
 
 	UFUNCTION()
 	void OnGameTypeChanged(EGameType PreviousGameType, EGameType NewGameType);

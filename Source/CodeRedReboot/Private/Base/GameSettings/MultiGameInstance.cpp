@@ -21,7 +21,7 @@ void UMultiGameInstance::Init()
 
 void UMultiGameInstance::SwitchGame(EGameType NewGameType)
 {
-	if (CurrentGameType != NewGameType)
+	if (CurrentGameType != NewGameType || (CurrentGameType != EGameType::Hub && NewGameType != EGameType::Hub))
 	{
 		// Notify listeners about the game type change
 		OnGameTypeChanged.Broadcast(CurrentGameType, NewGameType);

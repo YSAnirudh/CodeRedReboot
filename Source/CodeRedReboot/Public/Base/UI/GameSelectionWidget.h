@@ -17,7 +17,7 @@ public:
     virtual void NativeConstruct() override;
     
     UFUNCTION(BlueprintCallable, Category = "Game Selection")
-    void SelectGame(EGameType GameType);
+    void SelectGame(int32 GameIndex);
     
     UFUNCTION(BlueprintCallable, Category = "Game Selection")
     void PlaySelectedGame();

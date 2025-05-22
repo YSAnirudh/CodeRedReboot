@@ -20,7 +20,7 @@ void UGameSelectionWidget::NativeConstruct()
     // Select the first game
     if (AvailableGames.Num() > 0)
     {
-        SelectGame(AvailableGames[CurrentIndex]);
+        SelectGame(CurrentIndex);
     }
     
     // Update the visible game cards

@@ -101,6 +101,17 @@ void ABasePlayerController::SwitchGame(EGameType NewGameType)
 		return;
 	}
 
+	const EGameType CurrentGameType = GameInstance->GetCurrentGameType();
+
+	if (CurrentGameType != EGameType::Hub && NewGameType != EGameType::Hub)
+	{
+		UE_LOG(LogBaseInput, Error, TEXT("Cannot switch between games. Trying to switch to %s from %s."),
+			*UEnum::GetValueAsString(NewGameType),
+			*UEnum::GetValueAsString(CurrentGameType)
+		);
+		return;
+	}
+
 	if (GameInstance->GetCurrentGameType() == NewGameType)
 	{
 		UE_LOG(LogBaseInput, Warning, TEXT("Already in the requested game type: %s"), *UEnum::GetValueAsString(NewGameType));
