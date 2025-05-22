@@ -1,8 +1,18 @@
 #include "Base/UI/InGameHUDWidget.h"
 #include "Base/PlayerControllers/BasePlayerController.h"
-#include "Components/Button.h"
+#include "CommonButtonBase.h"
+#include "CommonTextBlock.h"
+#include "CommonInputSubsystem.h"
+#include "CommonUITypes.h"
 #include "Components/ProgressBar.h"
 #include "BaseLogChannels.h"
+
+UInGameHUDWidget::UInGameHUDWidget()
+{
+    // Configure CommonUI behavior
+    SetInputActionProcessingEnabled(true);
+    SetIsFocusable(true);
+}
 
 void UInGameHUDWidget::NativeConstruct()
 {
@@ -10,7 +20,43 @@ void UInGameHUDWidget::NativeConstruct()
     
     if (ReturnToHubButton)
     {
-        ReturnToHubButton->OnClicked.AddDynamic(this, &UInGameHUDWidget::OnReturnToHubClicked);
+        ReturnToHubButton->OnClicked().AddUObject(this, &UInGameHUDWidget::HandleReturnToHubClicked);
+    }
+}
+
+void UInGameHUDWidget::NativeOnActivated()
+{
+    Super::NativeOnActivated();
+    
+    // Bind input events when activated
+    BindInputEvents();
+}
+
+void UInGameHUDWidget::NativeOnDeactivated()
+{
+    // Unbind input events when deactivated
+    UnbindInputEvents();
+    
+    Super::NativeOnDeactivated();
+}
+
+void UInGameHUDWidget::BindInputEvents()
+{
+    // Register with the input subsystem for navigation events
+    if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
+    {
+        // Add input handlers for navigation
+        InputSubsystem->AddNavigationHandler(FCommonNavigationDelegate::CreateUObject(this, &UInGameHUDWidget::ReturnToHub), 
+            ECommonInputType::Gamepad, ECommonInputMode::Game, FName("UI_Menu"));
+    }
+}
+
+void UInGameHUDWidget::UnbindInputEvents()
+{
+    // Unregister from the input subsystem
+    if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
+    {
+        InputSubsystem->RemoveAllNavigationHandlers(this);
     }
 }
 
@@ -24,7 +70,24 @@ void UInGameHUDWidget::ReturnToHub()
     }
 }
 
-void UInGameHUDWidget::OnReturnToHubClicked()
+void UInGameHUDWidget::HandleReturnToHubClicked()
 {
     ReturnToHub();
+}
+
+void UInGameHUDWidget::UpdateHealthBar(float CurrentHealth, float MaxHealth)
+{
+    if (HealthBar)
+    {
+        const float HealthPercent = (MaxHealth > 0.0f) ? FMath::Clamp(CurrentHealth / MaxHealth, 0.0f, 1.0f) : 0.0f;
+        HealthBar->SetPercent(HealthPercent);
+    }
+    
+    if (HealthText)
+    {
+        FText HealthDisplay = FText::Format(NSLOCTEXT("InGameHUD", "HealthFormat", "{0}/{1}"), 
+            FText::AsNumber(FMath::FloorToInt(CurrentHealth)), 
+            FText::AsNumber(FMath::FloorToInt(MaxHealth)));
+        HealthText->SetText(HealthDisplay);
+    }
 }

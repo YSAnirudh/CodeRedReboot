@@ -1,36 +1,63 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "CommonActivatableWidget.h"
 #include "InGameHUDWidget.generated.h"
+
+class UCommonButtonBase;
+class UCommonTextBlock;
+class UProgressBar;
 
 /**
  * Base HUD widget for in-game display
+ * Uses CommonUI for better navigation and interaction
  */
 UCLASS()
-class CODEREDREBOOT_API UInGameHUDWidget : public UUserWidget
+class CODEREDREBOOT_API UInGameHUDWidget : public UCommonActivatableWidget
 {
     GENERATED_BODY()
     
 public:
+    UInGameHUDWidget();
+    
+    // UUserWidget overrides
+    virtual void NativeConstruct() override;
+    virtual void NativeOnActivated() override;
+    virtual void NativeOnDeactivated() override;
+    
+    /** Returns to the hub/main menu */
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void ReturnToHub();
     
-    UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
+    /** Updates the health bar display */
+    UFUNCTION(BlueprintCallable, Category = "HUD")
     void UpdateHealthBar(float CurrentHealth, float MaxHealth);
     
+    /** Updates game-specific attributes */
     UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
     void UpdateGameSpecificAttributes();
     
 protected:
-    virtual void NativeConstruct() override;
-    
+    /** Health bar progress indicator */
     UPROPERTY(BlueprintReadOnly, Category = "HUD", meta = (BindWidget))
-    class UProgressBar* HealthBar;
+    UProgressBar* HealthBar = nullptr;
     
+    /** Return to hub button */
     UPROPERTY(BlueprintReadOnly, Category = "HUD", meta = (BindWidget))
-    class UButton* ReturnToHubButton;
+    UCommonButtonBase* ReturnToHubButton = nullptr;
     
+    /** Health text display */
+    UPROPERTY(BlueprintReadOnly, Category = "HUD", meta = (BindWidget))
+    UCommonTextBlock* HealthText = nullptr;
+    
+    /** Handle return to hub button click */
     UFUNCTION()
-    void OnReturnToHubClicked();
+    void HandleReturnToHubClicked();
+    
+private:
+    /** Bind input events */
+    void BindInputEvents();
+    
+    /** Unbind input events */
+    void UnbindInputEvents();
 };

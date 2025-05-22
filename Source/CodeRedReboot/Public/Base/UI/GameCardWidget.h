@@ -1,47 +1,56 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "CommonButtonBase.h"
 #include "Base/GameSettings/MultiGameInstance.h"
 #include "GameCardWidget.generated.h"
 
+class UCommonTextBlock;
+class UImage;
+
 /**
  * Widget representing a single game option in the selection screen
+ * Uses CommonUI for better navigation and interaction
  */
 UCLASS()
-class CODEREDREBOOT_API UGameCardWidget : public UUserWidget
+class CODEREDREBOOT_API UGameCardWidget : public UCommonButtonBase
 {
     GENERATED_BODY()
     
 public:
+    UGameCardWidget();
+    
+    /** Sets the game type and updates the display */
     UFUNCTION(BlueprintCallable, Category = "Game Card")
     void SetGameType(EGameType InGameType);
     
-    UFUNCTION(BlueprintCallable, Category = "Game Card")
+    /** Gets the current game type */
+    UFUNCTION(BlueprintPure, Category = "Game Card")
     EGameType GetGameType() const { return GameType; }
     
-    UFUNCTION(BlueprintCallable, Category = "Game Card")
-    void SetSelected(bool bIsSelected);
-    
-    UFUNCTION(BlueprintImplementableEvent, Category = "Game Card")
-    void OnSelected(bool bIsSelected);
-    
+    /** Updates the visual representation based on game type */
     UFUNCTION(BlueprintImplementableEvent, Category = "Game Card")
     void UpdateGameInfo();
     
+    // CommonUI overrides
+    virtual void NativePreConstruct() override;
+    virtual void NativeOnCurrentTextStyleChanged() override;
+    virtual void NativeOnSelected(bool bIsSelected) override;
+    
 protected:
+    /** The game type this card represents */
     UPROPERTY(BlueprintReadOnly, Category = "Game Card")
-    EGameType GameType;
+    EGameType GameType = EGameType::None;
     
-    UPROPERTY(BlueprintReadOnly, Category = "Game Card")
-    bool bSelected;
-    
+    /** Title text for the game */
     UPROPERTY(BlueprintReadOnly, Category = "Game Card", meta = (BindWidget))
-    class UTextBlock* GameTitleText;
+    UCommonTextBlock* GameTitleText = nullptr;
     
+    /** Description text for the game */
     UPROPERTY(BlueprintReadOnly, Category = "Game Card", meta = (BindWidget))
-    class UTextBlock* GameDescriptionText;
+    UCommonTextBlock* GameDescriptionText = nullptr;
     
+    /** Thumbnail image for the game */
     UPROPERTY(BlueprintReadOnly, Category = "Game Card", meta = (BindWidget))
-    class UImage* GameThumbnail;
+    UImage* GameThumbnail = nullptr;
 };
