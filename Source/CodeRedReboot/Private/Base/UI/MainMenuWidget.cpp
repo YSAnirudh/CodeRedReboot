@@ -1,6 +1,6 @@
 #include "Base/UI/MainMenuWidget.h"
 #include "CommonButtonBase.h"
-#include "CommonActivatableWidgetStack.h"
+#include "Widgets/CommonActivatableWidgetContainer.h"
 #include "CommonInputSubsystem.h"
 #include "CommonUITypes.h"
 #include "Kismet/GameplayStatics.h"
@@ -10,7 +10,6 @@
 UMainMenuWidget::UMainMenuWidget()
 {
     // Configure CommonUI behavior
-    SetInputActionProcessingEnabled(true);
     SetIsFocusable(true);
 }
 
@@ -62,9 +61,6 @@ void UMainMenuWidget::BindInputEvents()
     // Register with the input subsystem for navigation events
     if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
     {
-        // Add input handlers for navigation
-        InputSubsystem->AddNavigationHandler(FCommonNavigationDelegate::CreateUObject(this, &UMainMenuWidget::QuitGame), 
-            ECommonInputType::Gamepad, ECommonInputMode::Menu, FName("UI_Menu"));
     }
 }
 
@@ -73,7 +69,6 @@ void UMainMenuWidget::UnbindInputEvents()
     // Unregister from the input subsystem
     if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
     {
-        InputSubsystem->RemoveAllNavigationHandlers(this);
     }
 }
 

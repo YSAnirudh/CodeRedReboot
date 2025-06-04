@@ -1,6 +1,6 @@
 #include "Base/UI/UIManagerSubsystem.h"
 #include "CommonActivatableWidget.h"
-#include "CommonActivatableWidgetContainerBase.h"
+#include "Widgets/CommonActivatableWidgetContainer.h"
 #include "BaseLogChannels.h"
 
 void UUIManagerSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -35,10 +35,10 @@ void UUIManagerSubsystem::Deinitialize()
     Super::Deinitialize();
 }
 
-UCommonActivatableWidget* UUIManagerSubsystem::PushWidgetToStack(TSubclassOf<UCommonActivatableWidget> WidgetClass, UCommonActivatableWidgetContainerBase* Stack)
+UCommonActivatableWidget* UUIManagerSubsystem::PushWidgetToStack(TSubclassOf<UCommonActivatableWidget> WidgetClass, UCommonActivatableWidgetStack* Stack)
 {
     // Use the provided stack or fall back to the main stack
-    UCommonActivatableWidgetContainerBase* TargetStack = Stack ? Stack : MainStack;
+    UCommonActivatableWidgetStack* TargetStack = Stack ? Stack : MainStack;
     
     if (!TargetStack)
     {
@@ -52,21 +52,13 @@ UCommonActivatableWidget* UUIManagerSubsystem::PushWidgetToStack(TSubclassOf<UCo
         return nullptr;
     }
     
-    // Create and push the widget
-    UCommonActivatableWidget* NewWidget = CreateWidget<UCommonActivatableWidget>(GetGameInstance(), WidgetClass);
-    if (NewWidget)
-    {
-        TargetStack->AddWidget(NewWidget);
-        return NewWidget;
-    }
-    
-    return nullptr;
+    return TargetStack->AddWidget(WidgetClass);
 }
 
-void UUIManagerSubsystem::PopWidgetFromStack(UCommonActivatableWidgetContainerBase* Stack)
+void UUIManagerSubsystem::PopWidgetFromStack(UCommonActivatableWidgetStack* Stack)
 {
     // Use the provided stack or fall back to the main stack
-    UCommonActivatableWidgetContainerBase* TargetStack = Stack ? Stack : MainStack;
+    UCommonActivatableWidgetStack* TargetStack = Stack ? Stack : MainStack;
     
     if (!TargetStack)
     {
@@ -75,10 +67,10 @@ void UUIManagerSubsystem::PopWidgetFromStack(UCommonActivatableWidgetContainerBa
     }
     
     // Pop the top widget
-    TargetStack->DeactivateTopWidget();
+    TargetStack->RemoveWidget(*TargetStack->GetActiveWidget());
 }
 
-void UUIManagerSubsystem::ClearWidgetStack(UCommonActivatableWidgetContainerBase* Stack)
+void UUIManagerSubsystem::ClearWidgetStack(UCommonActivatableWidgetStack* Stack)
 {
     // Use the provided stack or fall back to the main stack
     UCommonActivatableWidgetContainerBase* TargetStack = Stack ? Stack : MainStack;
@@ -93,7 +85,7 @@ void UUIManagerSubsystem::ClearWidgetStack(UCommonActivatableWidgetContainerBase
     TargetStack->ClearWidgets();
 }
 
-void UUIManagerSubsystem::SetMainStack(UCommonActivatableWidgetContainerBase* Stack)
+void UUIManagerSubsystem::SetMainStack(UCommonActivatableWidgetStack* Stack)
 {
     if (Stack)
     {
@@ -108,7 +100,7 @@ void UUIManagerSubsystem::SetMainStack(UCommonActivatableWidgetContainerBase* St
     }
 }
 
-void UUIManagerSubsystem::RegisterWidgetStack(FName StackName, UCommonActivatableWidgetContainerBase* Stack)
+void UUIManagerSubsystem::RegisterWidgetStack(FName StackName, UCommonActivatableWidgetStack* Stack)
 {
     if (!StackName.IsNone() && Stack)
     {
@@ -120,11 +112,11 @@ void UUIManagerSubsystem::RegisterWidgetStack(FName StackName, UCommonActivatabl
     }
 }
 
-UCommonActivatableWidgetContainerBase* UUIManagerSubsystem::GetWidgetStack(FName StackName) const
+UCommonActivatableWidgetStack* UUIManagerSubsystem::GetWidgetStack(FName StackName) const
 {
     if (!StackName.IsNone())
     {
-        if (UCommonActivatableWidgetContainerBase* const* FoundStack = RegisteredStacks.Find(StackName))
+        if (UCommonActivatableWidgetStack* const* FoundStack = RegisteredStacks.Find(StackName))
         {
             return *FoundStack;
         }

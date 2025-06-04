@@ -5,13 +5,8 @@
 UGameCardWidget::UGameCardWidget()
 {
     // Configure CommonUI button behavior
-    SelectionGroup = TEXT("GameCards");
     bToggleable = false;
     bApplyAlphaOnDisable = true;
-    bWrapButtonText = true;
-    
-    // Set default style tags
-    SetStyle(FName("GameCardButton"));
 }
 
 void UGameCardWidget::NativePreConstruct()

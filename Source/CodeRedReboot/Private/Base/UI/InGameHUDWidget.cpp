@@ -10,7 +10,6 @@
 UInGameHUDWidget::UInGameHUDWidget()
 {
     // Configure CommonUI behavior
-    SetInputActionProcessingEnabled(true);
     SetIsFocusable(true);
 }
 
@@ -45,9 +44,6 @@ void UInGameHUDWidget::BindInputEvents()
     // Register with the input subsystem for navigation events
     if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
     {
-        // Add input handlers for navigation
-        InputSubsystem->AddNavigationHandler(FCommonNavigationDelegate::CreateUObject(this, &UInGameHUDWidget::ReturnToHub), 
-            ECommonInputType::Gamepad, ECommonInputMode::Game, FName("UI_Menu"));
     }
 }
 
@@ -56,7 +52,6 @@ void UInGameHUDWidget::UnbindInputEvents()
     // Unregister from the input subsystem
     if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
     {
-        InputSubsystem->RemoveAllNavigationHandlers(this);
     }
 }
 

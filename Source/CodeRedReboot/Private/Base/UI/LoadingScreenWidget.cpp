@@ -6,7 +6,6 @@
 ULoadingScreenWidget::ULoadingScreenWidget()
 {
     // Loading screens typically don't need input
-    SetInputActionProcessingEnabled(false);
     SetIsFocusable(false);
 }
 

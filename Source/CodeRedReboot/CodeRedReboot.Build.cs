@@ -17,15 +17,15 @@ public class CodeRedReboot : ModuleRules
 			"GameplayTasks", 
 			"GameplayTags", 
 			"UMG",
-			"CommonUI",
-			"CommonInput"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { 
 			"Slate", 
 			"SlateCore",
-			"GameplayAbilities"
-		});
+            "GameplayAbilities",
+            "CommonUI",
+            "CommonInput"
+        });
 
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");

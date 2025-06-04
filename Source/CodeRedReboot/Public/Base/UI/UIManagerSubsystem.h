@@ -5,7 +5,7 @@
 #include "UIManagerSubsystem.generated.h"
 
 class UCommonActivatableWidget;
-class UCommonActivatableWidgetContainerBase;
+class UCommonActivatableWidgetStack;
 
 /**
  * Subsystem to manage UI navigation and widget stacks using CommonUI
@@ -28,35 +28,35 @@ public:
      * @return The newly created widget, or nullptr if creation failed
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Push Widget To Stack"))
-    UCommonActivatableWidget* PushWidgetToStack(TSubclassOf<UCommonActivatableWidget> WidgetClass, UCommonActivatableWidgetContainerBase* Stack = nullptr);
+    UCommonActivatableWidget* PushWidgetToStack(TSubclassOf<UCommonActivatableWidget> WidgetClass, UCommonActivatableWidgetStack* Stack = nullptr);
     
     /**
      * Pop the top widget from a stack
      * @param Stack Optional stack to pop from (uses main stack if null)
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Pop Widget From Stack"))
-    void PopWidgetFromStack(UCommonActivatableWidgetContainerBase* Stack = nullptr);
+    void PopWidgetFromStack(UCommonActivatableWidgetStack* Stack = nullptr);
     
     /**
      * Clear all widgets from a stack
      * @param Stack Optional stack to clear (uses main stack if null)
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Clear Widget Stack"))
-    void ClearWidgetStack(UCommonActivatableWidgetContainerBase* Stack = nullptr);
+    void ClearWidgetStack(UCommonActivatableWidgetStack* Stack = nullptr);
     
     /**
      * Get the main widget stack
      * @return The main widget stack
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Get Main Stack"))
-    UCommonActivatableWidgetContainerBase* GetMainStack() const { return MainStack; }
+    UCommonActivatableWidgetStack* GetMainStack() const { return MainStack; }
     
     /**
      * Set the main widget stack
      * @param Stack The stack to set as main
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Set Main Stack"))
-    void SetMainStack(UCommonActivatableWidgetContainerBase* Stack);
+    void SetMainStack(UCommonActivatableWidgetStack* Stack);
     
     /**
      * Register a widget stack with the manager
@@ -64,7 +64,7 @@ public:
      * @param Stack The stack to register
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Register Widget Stack"))
-    void RegisterWidgetStack(FName StackName, UCommonActivatableWidgetContainerBase* Stack);
+    void RegisterWidgetStack(FName StackName, UCommonActivatableWidgetStack* Stack);
     
     /**
      * Get a registered widget stack by name
@@ -72,14 +72,14 @@ public:
      * @return The requested stack, or nullptr if not found
      */
     UFUNCTION(BlueprintCallable, Category = "UI", meta = (DisplayName = "Get Widget Stack"))
-    UCommonActivatableWidgetContainerBase* GetWidgetStack(FName StackName) const;
+    UCommonActivatableWidgetStack* GetWidgetStack(FName StackName) const;
     
 private:
     // The main widget stack for the game
     UPROPERTY()
-    UCommonActivatableWidgetContainerBase* MainStack = nullptr;
+    UCommonActivatableWidgetStack* MainStack = nullptr;
     
     // Map of named widget stacks
     UPROPERTY()
-    TMap<FName, UCommonActivatableWidgetContainerBase*> RegisteredStacks;
+    TMap<FName, UCommonActivatableWidgetStack*> RegisteredStacks;
 };

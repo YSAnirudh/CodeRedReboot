@@ -10,7 +10,6 @@
 UGameSelectionWidget::UGameSelectionWidget()
 {
     // Configure CommonUI behavior
-    SetInputActionProcessingEnabled(true);
     SetIsFocusable(true);
 }
 
@@ -84,12 +83,6 @@ void UGameSelectionWidget::BindInputEvents()
     // Register with the input subsystem for navigation events
     if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
     {
-        // Add input handlers for navigation
-        InputSubsystem->AddNavigationHandler(FCommonNavigationDelegate::CreateUObject(this, &UGameSelectionWidget::HandlePlayButtonClicked), 
-            ECommonInputType::Gamepad, ECommonInputMode::Menu, FName("UI_Accept"));
-        
-        InputSubsystem->AddNavigationHandler(FCommonNavigationDelegate::CreateUObject(this, &UGameSelectionWidget::HandleBackButtonClicked), 
-            ECommonInputType::Gamepad, ECommonInputMode::Menu, FName("UI_Back"));
     }
 }
 
@@ -98,7 +91,6 @@ void UGameSelectionWidget::UnbindInputEvents()
     // Unregister from the input subsystem
     if (UCommonInputSubsystem* InputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer()))
     {
-        InputSubsystem->RemoveAllNavigationHandlers(this);
     }
 }
 
