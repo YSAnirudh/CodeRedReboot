@@ -4,17 +4,29 @@
 #include "Base/GameSettings/MultiGameInstance.h"
 #include "BaseLogChannels.h"
 #include "Kismet/GameplayStatics.h"
+#include "Base/Levels/LevelManagerSubsystem.h"
 
 UMultiGameInstance::UMultiGameInstance()
 {
-	CurrentGameType = EGameType::Hub;
 }
 
 void UMultiGameInstance::Init()
 {
 	Super::Init();
-	// Initialize default level paths
-	InitializeDefaultLevelPaths();
+
+	if (GameInformationTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Game Info Table"))
+
+		TArray<FGameInformation*> GameInfoRawTable;
+		GameInformationTable->GetAllRows<FGameInformation>(TEXT("Game Information Table"), GameInfoRawTable);
+
+		GameInformationList.Empty();
+		for (const FGameInformation* GameInfo : GameInfoRawTable)
+		{
+			GameInformationList.Add(*GameInfo);
+		}
+	}
 
 	UE_LOG(LogMultiGameInstance, Log, TEXT("MultiGameInstance Initialized"));
 }
@@ -26,11 +38,23 @@ void UMultiGameInstance::SwitchGame(EGameType NewGameType)
 		// Notify listeners about the game type change
 		OnGameTypeChanged.Broadcast(CurrentGameType, NewGameType);
 
-		FString LevelPath = GetGameLevelPath(CurrentGameType);
+		TArray<FPrimaryAssetId> LevelAssetIds = GetGameLevelAssetIds(NewGameType);
 
-		if (!LevelPath.IsEmpty())
+		if (!LevelAssetIds.IsEmpty())
 		{
-			UGameplayStatics::OpenLevel(this, FName(*LevelPath));
+
+			/*FLatentActionInfo LatentInfo;
+			LatentInfo.CallbackTarget = this;
+			LatentInfo.ExecutionFunction = "OnLevelLoadComplete";
+			LatentInfo.UUID = FGuid::NewGuid().A;
+			LatentInfo.Linkage = 0;*/
+
+			ULevelManagerSubsystem* LevelManagerSubsystem = GetSubsystem<ULevelManagerSubsystem>();
+			if (LevelManagerSubsystem)
+			{
+				LevelManagerSubsystem->LoadGameLevels(LevelAssetIds);
+			}
+
 			UE_LOG(LogMultiGameInstance, Log, TEXT("Switching to game: %s"), *UEnum::GetValueAsString(CurrentGameType));
 		}
 		else
@@ -40,22 +64,22 @@ void UMultiGameInstance::SwitchGame(EGameType NewGameType)
 	}
 }
 
-FString UMultiGameInstance::GetGameLevelPath(EGameType GameType) const
+TArray<FPrimaryAssetId> UMultiGameInstance::GetGameLevelAssetIds(EGameType GameType) const
 {
-	if (GameLevelPaths.Contains(GameType))
+	for (const FGameInformation& GameInfo : GameInformationList)
 	{
-		return GameLevelPaths[GameType];
+		if (GameInfo.GameType == GameType)
+		{
+			TArray<FPrimaryAssetId> LevelAssetIds;
+			for (const auto& LevelMapEntry : GameInfo.LevelDataMap)
+			{
+				LevelAssetIds.Add(LevelMapEntry.Value);
+			}
+			return LevelAssetIds;
+		}
 	}
 
-	return TEXT("/Game/Hub/Levels/L_Hub");
-}
-
-void UMultiGameInstance::InitializeDefaultLevelPaths()
-{
-	GameLevelPaths.Add(EGameType::Hub, TEXT("/Game/Hub/Levels/L_Hub"));
-	GameLevelPaths.Add(EGameType::GOW, TEXT("/Game/GOW/Levels/L_GOW"));
-	GameLevelPaths.Add(EGameType::SpiderMan, TEXT("/Game/SpiderMan/Levels/L_SpiderMan"));
-	GameLevelPaths.Add(EGameType::Control, TEXT("/Game/Control/Levels/L_Control"));
+	return TArray<FPrimaryAssetId>();
 }
 
 void UMultiGameInstance::OnLevelStreamingComplete()

@@ -5,6 +5,7 @@
 #include "Base/Input/BaseInputComponent.h"
 #include "Base/AbilitySystem/BaseAbilitySystemComponent.h"
 #include "BaseLogChannels.h"
+#include "BaseGameplayTags.h"
 #include "Base/Character/BasePawnInterface.h"
 #include "Base/GameSettings/MultiGameInstance.h"
 #include "Kismet/GameplayStatics.h"
@@ -38,6 +39,8 @@ void ABasePlayerController::SetupInputComponent()
 		if (UBaseInputComponent* EnhancedInputComponent = Cast<UBaseInputComponent>(InputComponent))
 		{
 			EnhancedInputComponent->BindAbilityActions(InputConfig, this, &ABasePlayerController::Input_AbilityInputTagPressed, &ABasePlayerController::Input_AbilityInputTagReleased, BindHandles);
+
+			//EnhancedInputComponent->BindNativeAction(InputConfig, )
 		}
 	}
 	else
@@ -118,21 +121,12 @@ void ABasePlayerController::SwitchGame(EGameType NewGameType)
 		return;
 	}
 
+	// Need Async Loading Screen that Tracks when a level is loaded.
 	ShowLoadingScreen();
 
 	GameInstance->SaveGameState();
 
 	GameInstance->SwitchGame(NewGameType);
-
-	const FString LevelPath = GameInstance->GetGameLevelPath(NewGameType);
-
-	FLatentActionInfo LatentInfo;
-	LatentInfo.CallbackTarget = this;
-	LatentInfo.ExecutionFunction = "OnLevelLoadComplete";
-	LatentInfo.UUID = FGuid::NewGuid().A;
-	LatentInfo.Linkage = 0;
-
-	UGameplayStatics::LoadStreamLevel(this, FName(*LevelPath), true, true, LatentInfo);
 
 	UE_LOG(LogBasePlayerController, Log, TEXT("Switching to game: %s"), *UEnum::GetValueAsString(NewGameType));
 }

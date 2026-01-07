@@ -8,6 +8,7 @@
 class UCommonButtonBase;
 class UCommonTileView;
 class UGameCardWidget;
+class UCarousel;
 
 /**
  * Widget for selecting which game to play with carousel navigation
@@ -26,10 +27,6 @@ public:
     virtual void NativeOnActivated() override;
     virtual void NativeOnDeactivated() override;
     
-    /** Selects a game by index */
-    UFUNCTION(BlueprintCallable, Category = "Game Selection")
-    void SelectGame(int32 GameIndex);
-    
     /** Launches the currently selected game */
     UFUNCTION(BlueprintCallable, Category = "Game Selection")
     void PlaySelectedGame();
@@ -47,25 +44,9 @@ public:
     void OnReturnToMainMenu();
     
 protected:
-    /** Currently selected game type */
-    UPROPERTY(BlueprintReadWrite, Category = "Game Selection")
-    EGameType SelectedGameType = EGameType::None;
-    
-    /** Array of all available games */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Selection")
-    TArray<EGameType> AvailableGames;
-    
-    /** Current index in the carousel */
-    UPROPERTY(BlueprintReadWrite, Category = "Game Selection")
-    int32 CurrentIndex = 0;
-    
-    /** Maximum number of visible game cards */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Game Selection", meta = (ClampMin = "1", ClampMax = "10"))
-    int32 MaxVisibleCards = 3;
-    
     /** Tile view for displaying game cards */
     UPROPERTY(BlueprintReadOnly, Category = "Game Selection", meta = (BindWidget))
-    UCommonTileView* GameTileView = nullptr;
+    UCarousel* GameCarousel = nullptr;
     
     /** Button to play the selected game */
     UPROPERTY(BlueprintReadOnly, Category = "Game Selection", meta = (BindWidget))
@@ -75,18 +56,6 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category = "Game Selection", meta = (BindWidget))
     UCommonButtonBase* BackButton = nullptr;
     
-    /** Get the indices of the currently visible games */
-    UFUNCTION(BlueprintPure, Category = "Game Selection")
-    TArray<int32> GetVisibleGameIndices() const;
-    
-    /** Get the game types of the currently visible games */
-    UFUNCTION(BlueprintPure, Category = "Game Selection")
-    TArray<EGameType> GetVisibleGames() const;
-    
-    /** Handle game card selection */
-    UFUNCTION()
-    void HandleGameCardClicked(UObject* Item);
-    
     /** Handle play button click */
     UFUNCTION()
     void HandlePlayButtonClicked();
@@ -94,10 +63,6 @@ protected:
     /** Handle back button click */
     UFUNCTION()
     void HandleBackButtonClicked();
-    
-    /** Initialize the tile view with game cards */
-    UFUNCTION(BlueprintCallable, Category = "Game Selection")
-    void InitializeGameTileView();
     
 private:
     /** Bind input events */

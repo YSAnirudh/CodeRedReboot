@@ -40,11 +40,11 @@ public:
 	FActiveGameplayEffectHandle ApplyGameplayEffectToSelfIfNotActive(const UGameplayEffect* GameplayEffect, float Level, const FGameplayEffectContextHandle& EffectContext, FPredictionKey PredictionKey = FPredictionKey());
 
 	/** Activate an Ability By Tag */
-	UFUNCTION(BlueprintCallable, Category = "CodeRed|GameplayAbility", meta = (DisplayName = "TryActivateAbilitiesByTag (First Active Ability)", ScriptName = "TryActivateAbilitiesByTag (First Active Ability)"))
+	UFUNCTION(BlueprintCallable, Category = "CodeRed|GameplayAbility", meta = (DisplayName = "TryActivateAbilitiesByTag (First Active Ability)", ScriptName = "TryActivateAbilitiesByTag_FirstActiveAbility"))
 	bool TryActivateAbilitiesByTag_Out_GA(const FGameplayTagContainer& Tags, UBaseGameplayAbility*& OutActivatedGameplayAbility, bool bAllowRemoteActivation = true);
 
 	/** Activate an Ability By Class */
-	UFUNCTION(BlueprintCallable, Category = "CodeRed|GameplayAbility", meta = (DisplayName = "TryActivateAbilitiesByClass (First Active Ability)", ScriptName = "TryActivateAbilitiesByClass (First Active Ability)"))
+	UFUNCTION(BlueprintCallable, Category = "CodeRed|GameplayAbility", meta = (DisplayName = "TryActivateAbilitiesByClass (First Active Ability)", ScriptName = "TryActivateAbilitiesByTag_FirstActiveAbility"))
 	bool TryActivateAbilitiesByClass_Out_GA(const TSubclassOf<UBaseGameplayAbility>& AbilityClass, UBaseGameplayAbility*& OutActivatedGameplayAbility, bool bAllowRemoteActivation = true);
 
 	UFUNCTION(BlueprintCallable, Category = "CodeRed|GameplayAbility")

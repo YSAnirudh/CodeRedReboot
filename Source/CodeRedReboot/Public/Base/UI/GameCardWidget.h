@@ -22,25 +22,27 @@ public:
     
     /** Sets the game type and updates the display */
     UFUNCTION(BlueprintCallable, Category = "Game Card")
-    void SetGameType(EGameType InGameType);
+    void SetGameInfo(const FGameInformation& GameInfo);
     
     /** Gets the current game type */
     UFUNCTION(BlueprintPure, Category = "Game Card")
-    EGameType GetGameType() const { return GameType; }
-    
-    /** Updates the visual representation based on game type */
-    UFUNCTION(BlueprintImplementableEvent, Category = "Game Card")
-    void UpdateGameInfo();
+    const FGameInformation& GetGameInfo() const { return GameInfo; }
+
+    /** Gets the current game type */
+    UFUNCTION(BlueprintPure, Category = "Game Card")
+    EGameType GetGameType() const { return GameInfo.GameType; }
     
     // CommonUI overrides
     virtual void NativePreConstruct() override;
+    // Common Button overrides
     virtual void NativeOnCurrentTextStyleChanged() override;
     virtual void NativeOnSelected(bool bIsSelected) override;
+    virtual void NativeOnClicked() override;
     
 protected:
     /** The game type this card represents */
     UPROPERTY(BlueprintReadOnly, Category = "Game Card")
-    EGameType GameType = EGameType::None;
+    FGameInformation GameInfo;
     
     /** Title text for the game */
     UPROPERTY(BlueprintReadOnly, Category = "Game Card", meta = (BindWidget))

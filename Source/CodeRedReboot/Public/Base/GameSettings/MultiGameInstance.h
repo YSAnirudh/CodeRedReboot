@@ -4,17 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Base/Data/GameInformationStructs.h"
 #include "MultiGameInstance.generated.h"
-
-UENUM(BlueprintType)
-enum class EGameType : uint8
-{
-	None        UMETA(DisplayName = "None"),
-	Hub         UMETA(DisplayName = "Hub"),
-	GOW	        UMETA(DisplayName = "GOW"),
-	SpiderMan   UMETA(DisplayName = "SpiderMan"),
-	Control     UMETA(DisplayName = "Control"),
-};
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameTypeChanged, EGameType, PreviousGameType, EGameType, NewGameType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameLoadComplete, EGameType, LoadedGameType);
@@ -40,7 +31,10 @@ public:
 	EGameType GetCurrentGameType() const { return CurrentGameType; }
 
 	UFUNCTION(BlueprintCallable, Category = "Game Switching")
-	FString GetGameLevelPath(EGameType GameType) const;
+	TArray<FPrimaryAssetId> GetGameLevelAssetIds(EGameType GameType) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Game Information")
+	const TArray<FGameInformation>& GetGameInformationList() const { return GameInformationList; };
 
 	float GetCurrentGameLoadingProgress() const { return CurrentGameLoadProgress; }
 
@@ -61,10 +55,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Game Switching")
 	EGameType CurrentGameType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Game Switching")
-	TMap<EGameType, FString> GameLevelPaths;
+	TArray<FGameInformation> GameInformationList;
 
-	void InitializeDefaultLevelPaths();
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Game Switching")
+	UDataTable* GameInformationTable;
 
 private:
 

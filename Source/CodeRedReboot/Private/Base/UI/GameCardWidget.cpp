@@ -12,9 +12,6 @@ UGameCardWidget::UGameCardWidget()
 void UGameCardWidget::NativePreConstruct()
 {
     Super::NativePreConstruct();
-    
-    // Update the game info when constructed
-    UpdateGameInfo();
 }
 
 void UGameCardWidget::NativeOnCurrentTextStyleChanged()
@@ -41,11 +38,21 @@ void UGameCardWidget::NativeOnSelected(bool bIsSelected)
     SetRenderScale(bIsSelected ? FVector2D(1.05f, 1.05f) : FVector2D(1.0f, 1.0f));
 }
 
-void UGameCardWidget::SetGameType(EGameType InGameType)
+void UGameCardWidget::NativeOnClicked()
 {
-    if (GameType != InGameType)
+    Super::NativeOnClicked();
+
+    UMultiGameInstance* GameInstance = Cast<UMultiGameInstance>(GetGameInstance());
+    if (GameInstance)
     {
-        GameType = InGameType;
-        UpdateGameInfo();
+        GameInstance->SwitchGame(GameInfo.GameType);
     }
+}
+
+void UGameCardWidget::SetGameInfo(const FGameInformation& InGameInfo)
+{
+    GameDescriptionText->SetText(FText::FromString(InGameInfo.GameDescription));
+    GameTitleText->SetText(FText::FromString(InGameInfo.GameName));
+    GameThumbnail = InGameInfo.GameThumbnail;
+    GameInfo = InGameInfo;
 }
